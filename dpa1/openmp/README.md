@@ -1,6 +1,7 @@
 # Exercises 1
+Teng, Chao && Jonas Karl, Böcker
 
-# Problem 1
+## Problem 1
 The nonparallel version of computing pi by Monte Carlo.
 ```c
 void compute_pi_monte_carlo(int n_steps)
@@ -24,7 +25,7 @@ void compute_pi_monte_carlo(int n_steps)
 }
 ```
 
-# Problem 2
+## Problem 2
 Here, I implemented a OpenMP version of Monte Carlo. I used `reduction` to avoid **data race** for `m`.
 ```c
 void compute_pi_monte_carlo_parallel(int n_steps)
@@ -51,7 +52,7 @@ void compute_pi_monte_carlo_parallel(int n_steps)
 }
 ```
 
-# Test Wall Time Elapsed for Our Programs
+## Test Wall Time Elapsed for Our Programs
 To test how good our parallel program performs, we need to measure the **Wall Time** (Time consumed in the real world) of our program instead of CPU Time. For the measurement of this, the recommended way is the Linux/MacOS command `time` or the function `omp_get_wtime` provided by `OpenMP` other than `clock`.
 
 I use the following code in my code for the measurement purpose (use `clock` if you wish to compile without `OpenMP`):
@@ -75,7 +76,7 @@ Estimated value of pi = 3.141704
 Wall time taken: 1.495120 seconds
 ```
 
-# Problem 3
+## Problem 3
 In this part we implement a MPI version of the Monte Carlo example.
 
 First make sure we have installed OpenMPI properly:
@@ -133,7 +134,7 @@ Process 1 out of 4
 Estimated Pi = 3.1414960000
 ```
 
-# Problem 4
+## Problem 4
 A broadcast binomial tree with 8 nodes looks like:
 ```
         0
@@ -146,7 +147,7 @@ A broadcast binomial tree with 8 nodes looks like:
 ```
 Once received a message, the node will send the message to the node in the layer below. The smaller children are those lie in the last layers (i.e. 1, 3, 5, 6, 7). Once they recive the message, their inability to inform more nodes hinders the efficiency of broadcast. Moreover, the cost of sending messages between nodes increases as the distance gets bigger. Sending message from node 0 to nodes on the last layer is $\log p$ (given we have $p$ processors). Thus, the total cost of serving small children first is $\Omega(\sum_{i=1}^{\log p}i)$, which is $\Omega(\log^2 p)$.
 
-# Problem 5
+## Problem 5
 My implementation of parallel scalar product between vector and vector:
 ```c
     double a[5] = {1.0, 2.0, 3.0, 4.0, 5.0},
@@ -166,7 +167,7 @@ My implementation of parallel scalar product between vector and vector:
 Suppose we use $n$ processors for vector of order $n$, the time complexity of doing multiplication is $O(1)$ while the complexity of reduction is $O(\log n)$, when we *divide and conquer*. As a result,
 $$T(n)=O(\log n).$$
 
-# Problem 6
+## Problem 6
 My implementation of parallel dot product between matrix and vector:
 ```c
     // dot product mat and vec
