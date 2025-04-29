@@ -1,3 +1,0 @@
-/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa1/openmp/cmake-build-debug/CMakeFiles/scalar_prod.dir
-/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa1/openmp/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa1/openmp/cmake-build-debug/CMakeFiles/rebuild_cache.dir
