@@ -205,3 +205,7 @@ Each row of the resulting vector is calculated in the same way with vector dot p
 $$
 T(n)=O(\log n).
 $$
+
+But....
+
+This seems true. However, in EREW model, exclusive read is not allowed so we can not do $n$ vector inner product at the same time so the time complexity should still be $O(n \log n).$
