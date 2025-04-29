@@ -1,7 +1,8 @@
-#include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <omp.h>
 #include <time.h>
+
 
 // void compute_pi_monte_carlo(int n_steps)
 // {
@@ -72,21 +73,17 @@ int main() {
         res += a[i] * b[i];
     }
 
-    printf("Dot product = %f\n", res);
+    srand(seed);
 
-    // scalar product mat and vec
-    double mat[2][2] = {{1.0, 2.0}, {3.0, 4.0}},
-           vec[2] = {1.0, 2.0};
-    double res2[2] = {0.0, 0.0};
-    double start = omp_get_wtime();
+    for (int i = 0; i < n; i++) {
+        const double x = rand() / (double) RAND_MAX;
+        const double y = rand() / (double) RAND_MAX;
 
-    // collaspe(2) is used to collapse the two loops into one
-#pragma omp parallel for collapse(2) reduction(+:res2[:2])
-    for (int i = 0; i < 2; i++) {
-        for (int j = 0; j < 2; j++) {
-            res2[i] += mat[i][j] * vec[j];
+        if (x * x + y * y <= 1) {
+            ++m;
         }
     }
+
     double end = omp_get_wtime();
     double time_spent = end - start;
     printf("Wall time taken: %f seconds\n", time_spent);
