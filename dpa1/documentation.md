@@ -66,11 +66,22 @@ n = 10.000.000: 70 ms
 
 ### Task 04
 
-In the regular Binomial Tree Broadcast, every node sends the data a number of steps
-equal to its own number plus the biggest power of 2 that results in a node that is
-receiving. Due to that in the next step, not only can the node send the data again 
-to the next lower power of two but also the node that got the data sends it further
-down the tree. 
+The root node of a full binomial tree is of rank O(p) where p is the total number of
+elements in the tree.
+Additionally, the ranks of the child nodes are 1, 2, ..., log(p) - 1 and for each
+child node of rank n, they have a child node themselves with rank n-1.
+The latter statement holds for any node in the graph.
+Serving the smallest children first means that only after log(p) steps of the broadcast,
+starting at the root node, the child node with the biggest rank is broadcast to. 
+This node itself needs log(p)-1 steps to reach its child node with the biggest rank.
+This means the total order of operations is computed by:
+
+$$ \sum_{i=0}^{log(p)} log(p) - i$$\
+$$ \Leftrightarrow \sum_{i=0}^{log(p)} log(p) - \sum_{i=0}^{log(p)} i$$\
+$$ \Leftrightarrow log^2(p) - \frac{log(p)\cdot(log(p)+1)}{2} $$\
+$$ \Leftrightarrow log^2(p) - \frac{log^2(p) + log(p)}{2} $$
+$$ \Leftrightarrow log^2(p) - \frac{1}{2}log^2(p) - \frac{1}{2}log(p) $$
+$$ \Rightarrow \Omega(log^2p)$$
 
 ### Task 05
 
