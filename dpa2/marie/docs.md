@@ -4,8 +4,7 @@ We will divide a for-loop over the array into $n/(n/log(n))=\log(n)$ parts for t
 
 Define an array B[$1..\log(n)$] to store the minimum index of first nonzero entry in the $k$-th part.
 
-1) iterate over the array and replace the entries:
-
+1) iterate over the array:
     ```python
         for i from 0 to n dopar: 
             if A[i] != 0:
