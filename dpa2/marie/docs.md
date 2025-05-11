@@ -2,7 +2,7 @@
 
 We will divide a for-loop over the array into $n/(n/log(n))=\log(n)$ parts for the $n/log(n)$ processors.
 
-Define an array B to store the minimum index of first nonzero entry in the $k$-th part.
+Define an array $B$ to store the minimum index of first nonzero entry in the $k$-th part.
 
 1) iterate over the array:
     ```python
@@ -14,6 +14,7 @@ Define an array B to store the minimum index of first nonzero entry in the $k$-t
                 B[k] = undefined
     ```
    $n$ operations using $\frac{n}{\log(n)}$ processors for a runtime of $O(\log(n))$.
-2) iterate over B to find the first non-undefined entry, which gives the answer
+2) iterate over $B$ to find the first non-undefined entry, which gives the answer. ($O(\log(n))$)
 
 ### Task 05:
+(`dpa-nr-5.pdf`)

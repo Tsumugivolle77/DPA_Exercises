@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa2/binomial_bcast/build",
-  "command": "/opt/homebrew/bin/aarch64-apple-darwin24-gcc-14  -isystem /opt/homebrew/Cellar/open-mpi/5.0.7/include -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/prog.dir/main.c.o -c /Users/offensive77/Code/25SoSe/DPA_Exercises/dpa2/binomial_bcast/main.c",
-  "file": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa2/binomial_bcast/main.c",
-  "output": "CMakeFiles/prog.dir/main.c.o"
-}
-]
