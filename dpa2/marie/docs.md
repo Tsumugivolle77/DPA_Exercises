@@ -2,7 +2,7 @@
 
 We will divide a for-loop over the array into $n/(n/log(n))=\log(n)$ parts for the $n/log(n)$ processors.
 
-Define an array B[$1..\log(n)$] to store the minimum index of first nonzero entry in the $k$-th part.
+Define an array B to store the minimum index of first nonzero entry in the $k$-th part.
 
 1) iterate over the array:
     ```python
