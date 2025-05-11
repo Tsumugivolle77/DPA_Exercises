@@ -1,1 +1,0 @@
-/opt/homebrew/bin/aarch64-apple-darwin24-gcc-14 -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/llvm/lib CMakeFiles/prog.dir/main.c.o -o prog  /opt/homebrew/Cellar/open-mpi/5.0.7/lib/libmpi.dylib
