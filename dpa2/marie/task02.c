@@ -36,7 +36,6 @@ int main() {
   // n =        10.000:  ||  0.00016  ||   0.0003
   // n =       100.000:  ||  0.00177  ||   0.0029
   // n =     1.000.000:  ||  0.0148   ||   0.02
-  // n =    10.000.000:  ||  0.136    ||   0.17
   const int n = 10000000;
 
   MPI_Init(NULL, NULL);
@@ -81,7 +80,7 @@ int main() {
       sum += numbers[i] & 7;
     }
 
-   printf("[%d] sum of the numbers' last bits: %lld\n", rank, sum);
+    printf("[%d] sum of the numbers' last bits: %lld\n", rank, sum);
 
     MPI_Barrier(MPI_COMM_WORLD);
   }

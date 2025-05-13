@@ -43,6 +43,20 @@ The relative speed-down is approx. 2x, which is reasonable for an $O(p)$ broadca
 
 ### Task 02:
 
+To execute a binomial tree broadcast to get the data from process 0 to every
+other location at first every other process is ordered to wait to receive data.
+Since now process 0 is not the only thread sending out data the function 
+```get_source``` is used by every process to calculate which other process 
+is expected to be sending the data to is using their rank. Afterward, a loop is
+started to send the data to the correct other processes according to the 
+pseudocode provided in the lecture. \\
+The speedup of this order of operations can be observed in the runtimes 
+measured for different values of n from 10 to 10.000.000 and using 4 and 8 
+processes respectively. It can be observed that the increase of the runtime from
+4 to 8 processes is no longer with an approximate factor of 2 but much lower 
+especially with larger values of n. Additionally, this broadcasting operation
+outperforms the previous naive implementation in each measured runtime.
+
 ### Task 04:
 
 We will divide a for-loop over the array into $n/(n/log(n))=\log(n)$ parts for the $n/log(n)$ processors.
