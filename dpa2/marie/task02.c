@@ -81,7 +81,7 @@ int main() {
       sum += numbers[i] & 7;
     }
 
-   // printf("[%d] sum of the numbers' last bits: %lld\n", rank, sum);
+   printf("[%d] sum of the numbers' last bits: %lld\n", rank, sum);
 
     MPI_Barrier(MPI_COMM_WORLD);
   }
