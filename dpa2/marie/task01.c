@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-int main(int argc, char** argv) {
+int main() {
   int rank, size;
 
   // numbers in vector   || runtime in seconds
@@ -18,7 +18,7 @@ int main(int argc, char** argv) {
   // n =    10.000.000:  ||  0.2    ||   0.26
   // n =   100.000.000:  ||  2.0    ||   2.5
   // n = 1.000.000.000:  || 28      ||  60
-  const int n = atoi(argv[1]);
+  const int n = 10000;
 
   MPI_Init(NULL, NULL);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
