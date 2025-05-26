@@ -10,11 +10,6 @@ add_compile_options(-fopenmp)
 include_directories(/opt/homebrew/Caskroom/miniforge/base/include/)
 
 find_package(OpenMP REQUIRED)
-find_package(MPI REQUIRED)
 if(OpenMP_C_FOUND)
     target_link_libraries(${TARGET_NAME} PUBLIC OpenMP::OpenMP_C)
-endif()
-
-if(MPI_C_FOUND)
-    target_link_libraries(${TARGET_NAME} PUBLIC MPI::MPI_C)
 endif()
