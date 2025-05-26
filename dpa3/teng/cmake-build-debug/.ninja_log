@@ -1,0 +1,9 @@
+# ninja log v6
+0	98	1748263799465304019	CMakeFiles/quick_sort_teng.dir/p1.c.o	9f2ee043181e601d
+98	136	1748263799563070293	quick_sort_teng	af09386ccaebbce1
+2	166	1748264227323644628	CMakeFiles/quick_sort_teng.dir/p1.c.o	9f2ee043181e601d
+166	209	1748264227488051438	quick_sort_teng	af09386ccaebbce1
+2	164	1748264460622947448	CMakeFiles/quick_sort_teng.dir/p1.c.o	9f2ee043181e601d
+164	206	1748264460785446183	quick_sort_teng	af09386ccaebbce1
+2	162	1748264590856407420	CMakeFiles/quick_sort_teng.dir/p1.c.o	9f2ee043181e601d
+162	203	1748264591016292583	quick_sort_teng	af09386ccaebbce1

@@ -65,17 +65,28 @@ void quicksort(long *arr, const int low, const int high) {
   }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
   const int size = 8000;
   long *arr = generate_array(size);
   assert(arr != NULL);
+  int num_threads = 0;
+
+  if (argc < 2) {
+    num_threads = 1;
+  } else {
+    num_threads = atoi(argv[1]);
+  }
 
 #pragma omp parallel
 #pragma omp single
+  omp_set_num_threads(num_threads);
+  double omp_time = omp_get_wtime();
   quicksort(arr, 0, size - 1);
+  omp_time = omp_get_wtime() - omp_time;
 
   if (test_sort(arr, size)) {
-    printf("The sorting was correct!\n");
+    printf("Number of threads is %d, the sorting was correct!\n", omp_get_num_threads());
+    printf("Time taken for sorting: %f seconds\n", omp_time);
   } else {
     printf("The sorting was incorrect!\n");
   }
