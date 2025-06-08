@@ -1,0 +1,11 @@
+csr graph created with 23947347 nodes and 28854312 edges
+Iteration 1: 4173936 active nodes remaining
+Iteration 2: 263755 active nodes remaining
+Iteration 3: 7841 active nodes remaining
+Iteration 4: 152 active nodes remaining
+Iteration 5: 4 active nodes remaining
+Iteration 6: 0 active nodes remaining
+MIS size: 10767331 (44.96% of nodes)
+Computation time: 0.2256 seconds
+Verifying MIS...
+MIS is valid: no adjacent nodes in the set

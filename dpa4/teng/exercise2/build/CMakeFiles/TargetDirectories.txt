@@ -1,0 +1,3 @@
+/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/build/CMakeFiles/dpa4-nr2.dir
+/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/build/CMakeFiles/edit_cache.dir
+/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/build/CMakeFiles/rebuild_cache.dir

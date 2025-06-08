@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/dpa4-nr2.dir/main.c.o -c /Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/main.c",
+  "file": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/main.c",
+  "output": "CMakeFiles/dpa4-nr2.dir/main.c.o"
+},
+{
+  "directory": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -o CMakeFiles/dpa4-nr2.dir/mmio.c.o -c /Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/mmio.c",
+  "file": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa4/teng/mmio.c",
+  "output": "CMakeFiles/dpa4-nr2.dir/mmio.c.o"
+}
+]
