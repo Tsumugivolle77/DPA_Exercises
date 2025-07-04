@@ -1,0 +1,8 @@
+[
+{
+  "directory": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa6/teng/build",
+  "command": "/opt/homebrew/bin/aarch64-apple-darwin24-gcc-14   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -fopenmp -o CMakeFiles/dpa6-nr1.dir/p1.c.o -c /Users/offensive77/Code/25SoSe/DPA_Exercises/dpa6/teng/p1.c",
+  "file": "/Users/offensive77/Code/25SoSe/DPA_Exercises/dpa6/teng/p1.c",
+  "output": "CMakeFiles/dpa6-nr1.dir/p1.c.o"
+}
+]
