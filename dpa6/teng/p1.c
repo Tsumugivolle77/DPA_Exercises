@@ -225,46 +225,80 @@ csr_graph* create_graph(dense_graph* dg) {
 }
 
 void relaxed_sl_assign_priorities(csr_graph *cg, int *priorities) {
+    int n = cg->n;
+    int *degree = (int *)malloc(n * sizeof(int));
+    bool *active = (bool *)malloc(n * sizeof(bool));
+
+    memcpy(degree, cg->degree, n * sizeof(int));
+    memset(active, true, n * sizeof(bool));
+
     int d = INT32_MAX;
-    int remove_order = 1;
-    bool *active = (bool *)calloc(cg->n, sizeof(bool));
-    int *degree = (int *)malloc(cg->n * sizeof(int));
-    memcpy(degree, cg->degree, cg->n * sizeof(int));
-    memset(active, true, cg->n * sizeof(bool));
 
-    // set d as the minimum degree of the graph
-#pragma omp parallel for reduction(min:d)
-    for (int i = 0; i < cg->n; ++i) {
-        d = cg->degree[i] < d ? cg->degree[i] : d;
+    #pragma omp parallel for reduction(min:d)
+    for (int i = 0; i < n; i++) {
+        if (degree[i] < d) d = degree[i];
     }
 
-    // min neighbor count of removed vertices
-    int min_ncount_of_removed = INT32_MAX;
-
-#pragma omp parallel for
-    for (int i = 0; i < cg->n; ++i) {
-        if (degree[i] > d || !active[i]) continue;
-        active[i] = false;
-        priorities[i] = remove_order;
-
-        int start = cg->row_ptr[i];
-        int end = cg->row_ptr[i+1];
-        int ncount_of_removed = end - start + 1;
-        min_ncount_of_removed = ncount_of_removed < min_ncount_of_removed ?
-                                ncount_of_removed : min_ncount_of_removed;
+    int i = 1;
+    int remaining = n;
+    
+    while (remaining > 0) {
+        bool *to_remove = (bool *)calloc(n, sizeof(bool));
+        int count = 0;
         
-        for (int j = start; j < end; ++j) {
-            int neighbor = cg->col_ind[j];
-            --degree[neighbor];
+        #pragma omp parallel for reduction(+:count)
+        for (int u = 0; u < n; u++) {
+            if (active[u] && degree[u] <= d) {
+                to_remove[u] = true;
+                count++;
+            }
         }
+        
+        #pragma omp parallel for
+        for (int u = 0; u < n; u++) {
+            if (to_remove[u]) {
+                priorities[u] = i;
+                active[u] = false;
+            }
+        }
+        
+        #pragma omp parallel for
+        for (int u = 0; u < n; u++) {
+            if (!to_remove[u] || !active[u]) continue;
+            
+            int start = cg->row_ptr[u];
+            int end = cg->row_ptr[u+1];
+            int lost_neighbors = 0;
+            
+            for (int j = start; j < end; j++) {
+                int v = cg->col_ind[j];
+                if (to_remove[v]) lost_neighbors++;
+            }
+            
+            #pragma omp atomic
+            degree[u] -= lost_neighbors;
+        }
+        
+        remaining -= count;
+        free(to_remove);
+        
+        // Update d
+        if (remaining > 0) {
+            int new_min_degree = INT32_MAX;
+            #pragma omp parallel for reduction(min:new_min_degree)
+            for (int u = 0; u < n; u++) {
+                if (active[u] && degree[u] < new_min_degree) {
+                    new_min_degree = degree[u];
+                }
+            }
+            d = (d + 1) > new_min_degree ? (d + 1) : new_min_degree;
+        }
+        
+        ++i;
     }
 
-    // update d
-    d = d + 1 > min_ncount_of_removed ? d + 1 : min_ncount_of_removed;
-    min_ncount_of_removed = INT32_MAX;
-    ++remove_order;
-
-    return;
+    free(degree);
+    free(active);
 }
 
 int main() {
@@ -273,12 +307,20 @@ int main() {
     free(g.I);
     free(g.J);
 
-    int *priorities = (int *)malloc(csr_g->n * sizeof(int));
-    relaxed_sl_assign_priorities(csr_g, priorities);
-
-    for (int i = 0; i < csr_g->n; ++i) {
-        printf("Vertex %d: Priority %d\n", i, priorities[i]);
+    int thread_count[] = {1, 2, 4, 8};
+    for (int i = 0; i < sizeof(thread_count)/sizeof(thread_count[0]); i++) {
+        omp_set_num_threads(thread_count[i]);
+        double start_time = omp_get_wtime();
+        int *priorities = (int *)malloc(csr_g->n * sizeof(int));
+        relaxed_sl_assign_priorities(csr_g, priorities);
+        double end_time = omp_get_wtime();
+        printf("Relaxed SL algorithm took %.6f seconds w/ %d threads.\n", end_time - start_time, thread_count[i]);
+        free(priorities);
     }
+
+    // for (int i = 0; i < csr_g->n; ++i) {
+    //     printf("Vertex %d: Priority %d\n", i, priorities[i]);
+    // }
 
     free(csr_g->col_ind);
     free(csr_g->row_ptr);
