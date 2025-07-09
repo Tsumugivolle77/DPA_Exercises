@@ -1,0 +1,1 @@
+/opt/homebrew/bin/aarch64-apple-darwin24-gcc-14 -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.2.sdk -Wl,-search_paths_first -Wl,-headerpad_max_install_names -L/opt/homebrew/opt/llvm/lib "CMakeFiles/dpa6-nr1.dir/p1.c.o" -o dpa6-nr1  /opt/homebrew/Cellar/gcc/14.2.0_1/lib/gcc/current/libgomp.dylib
