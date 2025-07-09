@@ -1,3 +1,4 @@
+#include <math.h>
 #include <omp.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -5,6 +6,7 @@
 #include <time.h>
 
 #define MAX_LEN 100
+#define min(a,b) ((a<b)?a:b)
 
 struct Matrix {
   int* u;
@@ -13,8 +15,8 @@ struct Matrix {
 };
 
 struct CSR_Matrix {
-  int* row;
-  int* col;
+  int* start_idxs;
+  int* nghbrs;
   int n, m;
 };
 
@@ -23,31 +25,31 @@ struct CSR_Matrix convert_to_csr(const struct Matrix matrix) {
   result.n = matrix.n;
   result.m = matrix.m;
 
-  result.row = calloc(result.n + 1, sizeof(int));
-  result.col = malloc(2 * result.m * sizeof(int));
+  result.start_idxs = calloc(result.n + 1, sizeof(int));
+  result.nghbrs = malloc(2 * result.m * sizeof(int));
 
-  if (result.row == NULL || result.col == NULL) {
+  if (result.start_idxs == NULL || result.nghbrs == NULL) {
     printf("malloc failed\n");
     exit(EXIT_FAILURE);
   }
 
   for (int i = 0; i < result.m; ++i) {
-    result.row[matrix.u[i] + 1]++;
-    result.row[matrix.v[i] + 1]++;
+    result.start_idxs[matrix.u[i] + 1]++;
+    result.start_idxs[matrix.v[i] + 1]++;
   }
 
   for (int i = 1; i <= result.n; ++i) {
-    result.row[i] += result.row[i - 1];
+    result.start_idxs[i] += result.start_idxs[i - 1];
   }
 
   int* current_pos = malloc((result.n + 1) * sizeof(int));
-  memcpy(current_pos, result.row, (result.n + 1) * sizeof(int));
+  memcpy(current_pos, result.start_idxs, (result.n + 1) * sizeof(int));
 
   for (int i = 0; i < result.m; ++i) {
     const int src = matrix.u[i];
     const int dst = matrix.v[i];
-    result.col[current_pos[src]++] = dst;
-    result.col[current_pos[dst]++] = src;
+    result.nghbrs[current_pos[src]++] = dst;
+    result.nghbrs[current_pos[dst]++] = src;
   }
 
   free(current_pos);
@@ -96,10 +98,17 @@ struct Matrix parse_matrix(const char* file_name) {
   return matrix;
 }
 
-
 int Get_Color(const int u, const int* C, const int* pred_starts, const int* pred_edges) {
   const int n = pred_starts[u + 1] - pred_starts[u] + 1;
+  if (n <= 0) {
+    fprintf(stderr, "Weird Error has occurred. Help\n");
+    exit(EXIT_FAILURE);
+  }
   int* suitable_colors = calloc(n, sizeof(int));
+  if (suitable_colors == NULL) {
+    fprintf(stderr, "Memory allocation failed\n");
+    exit(EXIT_FAILURE);
+  }
 
 #pragma omp parallel for
   for (int i = pred_starts[u]; i < pred_starts[u + 1]; ++i) {
@@ -131,13 +140,12 @@ void JP_Color(const int u, int* C,
               const int* pred_edges, const int* succ_edges,
               int* counts) {
   C[u] = Get_Color(u, C, pred_starts, pred_edges);
-
 #pragma omp parallel for
   for (int i = succ_starts[u]; i < succ_starts[u + 1]; ++i) {
     const int v = succ_edges[i];
     Join(v, counts);
     if (counts[v] == 0) {
-      JP_Color(v, C, pred_starts, succ_edges, pred_edges, succ_edges, counts);
+      JP_Color(v, C, pred_starts, succ_starts, pred_edges, succ_edges, counts);
     }
   }
 }
@@ -147,7 +155,6 @@ void JP(const int* V, const int* E, const int n, const int* P, int* C) {
     fprintf(stderr, "Error during memory assignment\n");
     exit(EXIT_FAILURE);
   }
-
   for (int i = 0; i < n; ++i) {
     C[i] = -1;
   }
@@ -166,19 +173,15 @@ void JP(const int* V, const int* E, const int n, const int* P, int* C) {
     for (int i = V[u]; i < V[u + 1]; ++i) {
       const int v = E[i];
       if (P[u] < P[v]) {
-        ++pred_amounts[u];
-        ++succ_amounts[v];
-      } else if (P[u] > P[v]) {
-        ++pred_amounts[v];
         ++succ_amounts[u];
+      } else if (P[u] > P[v]) {
+        ++pred_amounts[u];
       } else if (u > v) {
         // tiebreaker
-        succ_amounts[u]++;
-        pred_amounts[v]++;
+        ++pred_amounts[u];
       } else if (v > u) {
         // tiebreaker
-        pred_amounts[u]++;
-        succ_amounts[v]++;
+        ++succ_amounts[v];
       }
     }
   }
@@ -198,6 +201,7 @@ void JP(const int* V, const int* E, const int n, const int* P, int* C) {
     pred_starts[i] = pred_amounts[i - 1] + pred_starts[i - 1];
     succ_starts[i] = succ_amounts[i - 1] + succ_starts[i - 1];
   }
+  free(succ_amounts);
 
   int* pred_edges = malloc(pred_starts[n] * sizeof(int));
   int* succ_edges = malloc(succ_starts[n] * sizeof(int));
@@ -219,35 +223,25 @@ void JP(const int* V, const int* E, const int n, const int* P, int* C) {
     for (int i = V[u]; i < V[u + 1]; ++i) {
       const int v = E[i];
 
-      if (P[u] < P[v]) {
-        const int idx_1 = pred_starts[u] + pred_indices[u]++;
-        pred_edges[idx_1] = v;
-
-        const int idx_2 = succ_starts[v] + succ_indices[v]++;
-        pred_edges[idx_2] = u;
-      } else if (P[u] > P[v]) {
-        const int idx_1 = succ_starts[u] + succ_indices[u]++;
-        succ_edges[idx_1] = v;
-
-        const int idx_2 = pred_starts[v] + pred_indices[v]++;
-        succ_edges[idx_2] = u;
-      } else if (u < v) {
-        // tiebreaker
-        const int idx_1 = pred_starts[u] + pred_indices[u]++;
-        pred_edges[idx_1] = v;
-
-        const int idx_2 = succ_starts[v] + succ_indices[v]++;
-        pred_edges[idx_2] = u;
+      if (P[u] > P[v]) {
+        const int idx = pred_starts[u] + pred_indices[u]++;
+        pred_edges[idx] = v;
+      } else if (P[u] < P[v]) {
+        const int idx = succ_starts[u] + succ_indices[u]++;
+        succ_edges[idx] = v;
       } else if (u > v) {
         // tiebreaker
-        const int idx_1 = succ_starts[u] + succ_indices[u]++;
-        succ_edges[idx_1] = v;
-
-        const int idx_2 = pred_starts[v] + pred_indices[v]++;
-        succ_edges[idx_2] = u;
+        const int idx = pred_starts[u] + pred_indices[u]++;
+        pred_edges[idx] = v;
+      } else if (u < v) {
+        // tiebreaker
+        const int idx = succ_starts[u] + succ_indices[u]++;
+        succ_edges[idx] = v;
       }
     }
   }
+  free(pred_indices);
+  free(succ_indices);
 
   int* counts = calloc(n, sizeof(int));
 
@@ -256,9 +250,11 @@ void JP(const int* V, const int* E, const int n, const int* P, int* C) {
     exit(EXIT_FAILURE);
   }
 
+#pragma omp parallel for
   for (int i = 0; i < n; ++i) {
     counts[i] = pred_amounts[i];
   }
+  free(pred_amounts);
 
 #pragma omp parallel for
   for (int u = 0; u < n; ++u) {
@@ -267,14 +263,10 @@ void JP(const int* V, const int* E, const int n, const int* P, int* C) {
     }
   }
 
-  free(pred_amounts);
-  free(succ_amounts);
   free(pred_starts);
   free(succ_starts);
   free(pred_edges);
   free(succ_edges);
-  free(pred_indices);
-  free(succ_indices);
   free(counts);
 }
 
@@ -300,7 +292,7 @@ void random(int* P, const int n) {
 
 void largest_degree_first(int* P, const int n, const int* V, const int* E) {
   int max_degree = -1;
-  int max_degree_index = -1;
+  int max_degree_index = 0;
 
 #pragma omp parallel for
   for (int i = 0; i < n; ++i) {
@@ -312,10 +304,10 @@ void largest_degree_first(int* P, const int n, const int* V, const int* E) {
   for (int i = 0; i < n; ++i) {
 #pragma omp parallel for
     for (int j = 0; j < n; ++j) {
-      if (P[i] == -1 && V[j+1] - V[i] > max_degree) {
+      if (P[i] == -1 && V[j + 1] - V[i] > max_degree) {
 #pragma omp critical
         {
-          max_degree = V[j+1] - V[i];
+          max_degree = V[j + 1] - V[i];
           max_degree_index = j;
         }
       }
@@ -333,23 +325,43 @@ int main() {
   scanf("%s", file_name);
   printf("Reading in the File...");
   const struct Matrix matrix = parse_matrix(file_name);
+//  const struct Matrix matrix = parse_matrix("../week06/road_usa.mtx");
   printf("[Done]\nConverting to compressed row storage...");
   const struct CSR_Matrix csr_matrix = convert_to_csr(matrix);
+  free(matrix.u);
+  free(matrix.v);
 
   int* P = calloc(csr_matrix.n, sizeof(int));
   int* C = calloc(csr_matrix.n, sizeof(int));
+
+  if (P == NULL || C == NULL) {
+    fprintf(stderr, "Error in allocating memory\n");
+    exit(EXIT_FAILURE);
+  }
 
   printf("[Done]\nAssigning Priorities...");
   first_fit(P, csr_matrix.n);
 
   printf("[Done]\nCalculating coloring...");
-  JP(csr_matrix.row, csr_matrix.col, csr_matrix.n, P, C);
+  JP(csr_matrix.start_idxs, csr_matrix.nghbrs, csr_matrix.n, P, C);
   printf("[Done]\n");
 
-  free(matrix.u);
-  free(matrix.v);
-  free(csr_matrix.row);
-  free(csr_matrix.col);
+  const int amount = min(csr_matrix.n / 2, 10);
+  printf("Printing the color of the first %d nodes:\n", amount);
+  for (int i = 0; i < amount; ++i) {
+    printf("C[%d] = %d\n", i, C[i]);
+  }
+
+  int max_color = 0;
+  for (int i = 0; i < csr_matrix.n; ++i) {
+    if (C[i] > max_color) {
+      max_color = C[i];
+    }
+  }
+  printf("Amount of Colors used: %d", max_color);
+
+  free(csr_matrix.start_idxs);
+  free(csr_matrix.nghbrs);
 
   return 0;
 }
